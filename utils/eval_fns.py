@@ -29,7 +29,7 @@ def mae_predict(model, dataloader, device, mask_ratio, single_batch=True):
             if hasattr(model, 'module'):
                 model = model.module
 
-            if not model.simmim:
+            if model.mask_method == 'mae':
                 # Put patches back in order
                 pred = model.unpatchify(pred)
 
@@ -164,7 +164,7 @@ def ft_predict(model, dataloader, device, num_batches=None, return_images=False,
             labels = labels[:,:num_labels]
     
         # Run predictions
-        model_outputs = model(samples, mask=masks, ra_dec=ra_decs)
+        model_outputs = model(samples, mask=masks, ra_dec=ra_decs, run_mim=False, run_pred=True)
 
         if hasattr(model, 'module'):
             model = model.module

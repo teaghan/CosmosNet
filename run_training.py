@@ -55,7 +55,6 @@ def main(args):
     model, losses, cur_iter, optimizer, lr_scheduler = build_model(config, model_filename, 
                                                                    device, build_optimizer=True)
 
-
     # Data loader stuff
     num_workers = min([os.cpu_count(),12*n_gpu])
     if num_workers>1:
@@ -63,12 +62,14 @@ def main(args):
     num_workers = num_workers//2
         
     # Masking stuff
-    if 'mim' in config['ARCHITECTURE']['model_type']:
+    if config['MIM TRAINING']['mask_method']=='simmim':
         mask_ratio = None
         max_mask_ratio = float(config['MIM TRAINING']['max_mask_ratio'])
-    else:
+    elif config['MIM TRAINING']['mask_method']=='mae':
         mask_ratio = float(config['MIM TRAINING']['mask_ratio'])
         max_mask_ratio = None
+    else:
+        raise ValueError("mask_method has to be set to either 'simmim' or 'mae' in the config file.")
 
     # Build dataloaders
     if 'train_mim_data_file' in config['DATA']:
@@ -147,16 +148,16 @@ def main(args):
                                         num_patches=model.module.patch_embed.num_patches,
                                         shuffle=True)
 
-
-    # Supervised training params
-    get_sup_loss_weight = create_loss_weight_interpolator(float(config['SUPERVISED TRAINING']['init_loss_weight']), 
-                                                      float(config['SUPERVISED TRAINING']['final_loss_weight']), 
-                                                      int(float(config['SUPERVISED TRAINING']['loss_weight_plateau_batch_iters'])))
-
     # Training iterations paramaters are all measured from starting point
     total_batch_iters = int(float(config['MIM TRAINING']['total_batch_iters']))
     stop_mim_batch_iters = int(float(config['MIM TRAINING']['stop_mim_batch_iters']))
     start_sup_batch_iters = int(float(config['SUPERVISED TRAINING']['start_batch_iters']))
+
+    # Supervised training params
+    get_sup_loss_weight = create_loss_weight_interpolator(float(config['SUPERVISED TRAINING']['init_loss_weight']), 
+                                                          float(config['SUPERVISED TRAINING']['final_loss_weight']), 
+                                                          start_sup_batch_iters,
+                                                          int(float(config['SUPERVISED TRAINING']['loss_weight_plateau_batch_iters'])))
 
         
     train_network(model, dataloader_mim_train, dataloader_mim_val, train_nested_batches,

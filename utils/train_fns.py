@@ -14,7 +14,7 @@ from sklearn.linear_model import LogisticRegression, ElasticNet
 from sklearn.metrics import accuracy_score, mean_squared_error, r2_score
 from sklearn.preprocessing import StandardScaler
 
-def create_loss_weight_interpolator(initial_value, final_value, max_iter):
+def create_loss_weight_interpolator(initial_value, final_value, start_iter, max_iter):
     """
     Creates a function for linear interpolation of the loss weight.
     
@@ -36,7 +36,9 @@ def create_loss_weight_interpolator(initial_value, final_value, max_iter):
         Returns:
         - float: Interpolated loss weight.
         """
-        if current_iter >= max_iter:
+        if current_iter < start_iter:
+            return initial_value
+        elif current_iter >= max_iter:
             return final_value
         else:
             return initial_value + (final_value - initial_value) * (current_iter / max_iter)

@@ -19,14 +19,14 @@ from location_encoder import LocationEncoder
 def build_model(config, model_filename, device, build_optimizer=False):
 
     # Model architecture
+    mask_method = config['MIM TRAINING']['mask_method']
     norm_pix_loss = str2bool(config['MIM TRAINING']['norm_pix_loss'])
     img_size = int(config['ARCHITECTURE']['img_size'])
     pixel_mean = float(config['DATA']['pixel_mean'])
     pixel_std = float(config['DATA']['pixel_std'])
     num_channels = int(config['ARCHITECTURE']['num_channels'])
-    embed_dim = int(config['ARCHITECTURE']['embed_dim'])
     patch_size = int(config['ARCHITECTURE']['patch_size'])
-    model_type = config['ARCHITECTURE']['model_type']
+    model_size = config['ARCHITECTURE']['model_size']
     mim_loss_fn = config['MIM TRAINING']['loss_fn']
     ra_dec = str2bool(config['ARCHITECTURE']['ra_dec'])
 
@@ -41,115 +41,68 @@ def build_model(config, model_filename, device, build_optimizer=False):
 
 
     # Construct the model
-    if model_type=='base':
-        model = mae_vit_base(embed_dim=embed_dim, 
-                             img_size=img_size,
-                             in_chans=num_channels,
-                             patch_size=patch_size,
-                             norm_pix_loss=norm_pix_loss,
-                             mim_loss_fn=mim_loss_fn,
-                             pixel_mean=pixel_mean,
-                             pixel_std=pixel_std,
-                             ra_dec=ra_dec,
-                             num_classes=num_labels,
-                             label_means=label_means,
-                             label_stds=label_stds,
-                             sup_loss_fn=sup_loss_fn,
-                            global_pool=global_pool)
-    elif model_type=='large':
-        model = mae_vit_large(embed_dim=embed_dim,
-                              img_size=img_size,
-                              in_chans=num_channels,
-                              patch_size=patch_size,
-                              norm_pix_loss=norm_pix_loss,
-                              mim_loss_fn=mim_loss_fn,
-                              pixel_mean=pixel_mean,
-                              pixel_std=pixel_std,
-                             ra_dec=ra_dec,
-                             num_classes=num_labels,
-                             label_means=label_means,
-                             label_stds=label_stds,
-                             sup_loss_fn=sup_loss_fn,
-                            global_pool=global_pool)
-    elif model_type=='huge':
-        model = mae_vit_huge(embed_dim=embed_dim,
-                             img_size=img_size,
-                             in_chans=num_channels,
-                             patch_size=patch_size,
-                             norm_pix_loss=norm_pix_loss,
-                             mim_loss_fn=mim_loss_fn,
-                             pixel_mean=pixel_mean,
-                             pixel_std=pixel_std,
-                             ra_dec=ra_dec,
-                             num_classes=num_labels,
-                             label_means=label_means,
-                             label_stds=label_stds,
-                             sup_loss_fn=sup_loss_fn,
-                            global_pool=global_pool)
-    elif model_type=='simmim':
-        model = simmim_vit(embed_dim=embed_dim,
-                           img_size=img_size,
-                           in_chans=num_channels,
-                           patch_size=patch_size,
-                           norm_pix_loss=norm_pix_loss,
-                           simmim=True,
-                           mim_loss_fn=mim_loss_fn,
-                           pixel_mean=pixel_mean,
-                           pixel_std=pixel_std,
-                             ra_dec=ra_dec,
-                             num_classes=num_labels,
-                             label_means=label_means,
-                             label_stds=label_stds,
-                             sup_loss_fn=sup_loss_fn,
-                            global_pool=global_pool)
-    elif model_type=='mimlarge':
-        model = mim_vit_large(embed_dim=embed_dim,
-                           img_size=img_size,
-                           in_chans=num_channels,
-                           patch_size=patch_size,
-                           norm_pix_loss=norm_pix_loss,
-                           simmim=True,
-                           mim_loss_fn=mim_loss_fn,
-                           pixel_mean=pixel_mean,
-                           pixel_std=pixel_std,
-                             ra_dec=ra_dec,
-                             num_classes=num_labels,
-                             label_means=label_means,
-                             label_stds=label_stds,
-                             sup_loss_fn=sup_loss_fn,
-                            global_pool=global_pool)
-    elif model_type=='mimhuge':
-        model = mim_vit_huge(embed_dim=embed_dim,
-                           img_size=img_size,
-                           in_chans=num_channels,
-                           patch_size=patch_size,
-                           norm_pix_loss=norm_pix_loss,
-                           simmim=True,
-                           mim_loss_fn=mim_loss_fn,
-                           pixel_mean=pixel_mean,
-                           pixel_std=pixel_std,
-                             ra_dec=ra_dec,
-                             num_classes=num_labels,
-                             label_means=label_means,
-                             label_stds=label_stds,
-                             sup_loss_fn=sup_loss_fn,
-                            global_pool=global_pool)
-    elif model_type=='maesimple':
-        model = mae_vit_base_with_simple_decoder(embed_dim=embed_dim,
-                           img_size=img_size,
-                           in_chans=num_channels,
-                           patch_size=patch_size,
-                           norm_pix_loss=norm_pix_loss,
-                           simmim=False,
-                           mim_loss_fn=mim_loss_fn,
-                           pixel_mean=pixel_mean,
-                           pixel_std=pixel_std,
-                             ra_dec=ra_dec,
-                             num_classes=num_labels,
-                             label_means=label_means,
-                             label_stds=label_stds,
-                             sup_loss_fn=sup_loss_fn,
-                            global_pool=global_pool)
+    if model_size=='small':
+        model = mim_small(img_size=img_size,
+                        in_chans=num_channels,
+                        patch_size=patch_size,
+                        mask_method=mask_method,
+                        norm_pix_loss=norm_pix_loss,
+                        mim_loss_fn=mim_loss_fn,
+                        pixel_mean=pixel_mean,
+                        pixel_std=pixel_std,
+                        ra_dec=ra_dec,
+                        num_classes=num_labels,
+                        label_means=label_means,
+                        label_stds=label_stds,
+                        sup_loss_fn=sup_loss_fn,
+                        global_pool=global_pool)
+    elif model_size=='base':
+        model = mim_base(img_size=img_size,
+                        in_chans=num_channels,
+                        patch_size=patch_size,
+                        mask_method=mask_method,
+                        norm_pix_loss=norm_pix_loss,
+                        mim_loss_fn=mim_loss_fn,
+                        pixel_mean=pixel_mean,
+                        pixel_std=pixel_std,
+                        ra_dec=ra_dec,
+                        num_classes=num_labels,
+                        label_means=label_means,
+                        label_stds=label_stds,
+                        sup_loss_fn=sup_loss_fn,
+                        global_pool=global_pool)
+    elif model_size=='large':
+        model = mim_large(img_size=img_size,
+                        in_chans=num_channels,
+                        patch_size=patch_size,
+                        mask_method=mask_method,
+                        norm_pix_loss=norm_pix_loss,
+                        mim_loss_fn=mim_loss_fn,
+                        pixel_mean=pixel_mean,
+                        pixel_std=pixel_std,
+                        ra_dec=ra_dec,
+                        num_classes=num_labels,
+                        label_means=label_means,
+                        label_stds=label_stds,
+                        sup_loss_fn=sup_loss_fn,
+                        global_pool=global_pool)
+    elif model_size=='huge':
+        model = mim_huge(img_size=img_size,
+                        in_chans=num_channels,
+                        patch_size=patch_size,
+                        mask_method=mask_method,
+                        norm_pix_loss=norm_pix_loss,
+                        mim_loss_fn=mim_loss_fn,
+                        pixel_mean=pixel_mean,
+                        pixel_std=pixel_std,
+                        ra_dec=ra_dec,
+                        num_classes=num_labels,
+                        label_means=label_means,
+                        label_stds=label_stds,
+                        sup_loss_fn=sup_loss_fn,
+                        global_pool=global_pool)
+    else:
+        raise ValueError("model_size has to be set to either 'small', 'base', 'large', or 'hugeh' in the config file.")
 
     model.to(device)
 
@@ -220,22 +173,22 @@ def load_model(model, model_filename, optimizer=None, lr_scheduler=None):
         
     return model, losses, cur_iter
 
-class MIMViT(timm.models.vision_transformer.VisionTransformer):
-    '''Masked Autoencoder with VisionTransformer backbone.'''
+class MIM(timm.models.vision_transformer.VisionTransformer):
+    ''''''
     def __init__(self, img_size=224, patch_size=16, in_chans=3,
                  embed_dim=1024, depth=24, num_heads=16,
                  decoder_embed_dim=512, decoder_depth=8, decoder_num_heads=16,
                  mlp_ratio=4., norm_layer=nn.LayerNorm, norm_pix_loss=False, 
-                 simmim=False, mim_loss_fn='mse', pixel_mean=0, pixel_std=1., ra_dec=False,
+                 mask_method='simmim', mim_loss_fn='mse', pixel_mean=0, pixel_std=1., ra_dec=False,
                  label_means=[0], label_stds=[1], sup_loss_fn='mse', **kwargs):
         
-        super(MIMViT, self).__init__(img_size=img_size, patch_size=patch_size,
+        super(MIM, self).__init__(img_size=img_size, patch_size=patch_size,
                                       embed_dim=embed_dim, depth=depth, 
                                      num_heads=num_heads, in_chans=in_chans,
                                      mlp_ratio=mlp_ratio, norm_layer=norm_layer,
                                      **kwargs)
 
-        self.simmim = simmim
+        self.mask_method = mask_method
         self.mim_loss_fn = mim_loss_fn
         self.pixel_mean = pixel_mean
         self.pixel_std = pixel_std
@@ -286,7 +239,7 @@ class MIMViT(timm.models.vision_transformer.VisionTransformer):
         # Pre-compute the tile size based on expected image dimensions
         self.tile_size = (img_size)//(patch_size)
         
-        if self.simmim:
+        if self.mask_method == 'simmim':
 
             dec_upsample_size = self.tile_size
             
@@ -299,7 +252,7 @@ class MIMViT(timm.models.vision_transformer.VisionTransformer):
             )
             self.mask_token = nn.Parameter(torch.zeros(1, 1, 1))
 
-        else:
+        elif self.mask_method == 'mae':
             # --------------------------------------------------------------------------
             # MAE decoder specifics
             self.decoder_embed = nn.Linear(embed_dim, decoder_embed_dim, bias=True)
@@ -338,7 +291,7 @@ class MIMViT(timm.models.vision_transformer.VisionTransformer):
                                             cls_token=True, ra_dec=self.ra_dec)
         self.pos_embed.data.copy_(torch.from_numpy(pos_embed).float().unsqueeze(0))
 
-        if not self.simmim:
+        if self.mask_method == 'mae':
             decoder_pos_embed = get_2d_sincos_pos_embed(self.decoder_pos_embed.shape[-1], 
                                                         int(self.patch_embed.num_patches**.5), 
                                                         cls_token=True, ra_dec=self.ra_dec)
@@ -434,7 +387,7 @@ class MIMViT(timm.models.vision_transformer.VisionTransformer):
         # Replace NaN values with patch_mask_values
         x = torch.where(torch.isnan(x), patch_mask_values, x)
         
-        if self.simmim:
+        if self.mask_method == 'simmim':
             ids_restore = None
             
             # Image is masked where mask==1 and replaced with the values in patch_mask_values
@@ -446,7 +399,7 @@ class MIMViT(timm.models.vision_transformer.VisionTransformer):
 
         x = x + self.pos_embed[:, self.num_extra_tokens:, :]
 
-        if not self.simmim:
+        if self.mask_method == 'mae':
             # masking: length -> length * mask_ratio
             x, mask, ids_restore = self.random_masking(x, mask_ratio)
 
@@ -467,7 +420,7 @@ class MIMViT(timm.models.vision_transformer.VisionTransformer):
         
         x = self.norm(x)
         
-        if self.simmim and reshape_out:
+        if (self.mask_method == 'simmim') and reshape_out:
             x = x[:, self.num_extra_tokens:]
             B, L, C = x.shape
             H = W = int(L ** 0.5)
@@ -476,7 +429,7 @@ class MIMViT(timm.models.vision_transformer.VisionTransformer):
         return x, mask, ids_restore
 
     def forward_decoder(self, x, ids_restore):
-        if not self.simmim:
+        if self.mask_method == 'mae':
             # embed tokens
             x = self.decoder_embed(x)
     
@@ -515,7 +468,7 @@ class MIMViT(timm.models.vision_transformer.VisionTransformer):
         mask: [N, L], 0 is keep, 1 is remove, 
         """
         
-        if self.simmim:
+        if self.mask_method == 'simmim':
             # Invert nan_mask because we want 1s where the values are NOT NaN (valid for loss calculation)
             valid_data_mask = ~torch.isnan(imgs)
             valid_data_mask = valid_data_mask.to(imgs.dtype)
@@ -615,55 +568,30 @@ class MIMViT(timm.models.vision_transformer.VisionTransformer):
         elif run_pred:
             return self.forward_head(latent)
 
-def mae_vit_base_with_simple_decoder(**kwargs):
-    model = MIMViT(
-        depth=12, num_heads=12,
-        decoder_embed_dim=512, decoder_depth=1, decoder_num_heads=1,
+def mim_small(**kwargs):
+    model = MIM(
+        embed_dim=192, depth=12, num_heads=3,
+        decoder_embed_dim=192, decoder_depth=4, decoder_num_heads=3,
         mlp_ratio=4, norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)
     return model
 
-def mae_vit_base(**kwargs):
-    model = MIMViT(
-        depth=12, num_heads=12,
+def mim_base(**kwargs):
+    model = MIM(
+        embed_dim=768, depth=12, num_heads=12,
         decoder_embed_dim=512, decoder_depth=8, decoder_num_heads=16,
         mlp_ratio=4, norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)
     return model
 
-def mae_vit_large(**kwargs):
-    model = MIMViT(
-        depth=24, num_heads=16,
+def mim_large(**kwargs):
+    model = MIM(
+        embed_dim=1024, depth=24, num_heads=16,
         decoder_embed_dim=512, decoder_depth=8, decoder_num_heads=16,
         mlp_ratio=4, norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)
     return model
 
-def mae_vit_huge(**kwargs):
-    model = MIMViT(
-        depth=32, num_heads=16,
-        decoder_embed_dim=512, decoder_depth=8, decoder_num_heads=16,
-        mlp_ratio=4, norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)
-    return model
-
-def simmim_vit(**kwargs):
-    #drop_rate = 0.0
-    #drop_path_rate = 0.1
-    #init_values = 0.1
-
-    model = MIMViT(
-        depth=12, num_heads=12,
-        decoder_embed_dim=512, decoder_depth=8, decoder_num_heads=16,
-        mlp_ratio=4, norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)
-    return model
-
-def mim_vit_large(**kwargs):
-    model = MIMViT(
-        depth=24, num_heads=16,
-        decoder_embed_dim=512, decoder_depth=8, decoder_num_heads=16,
-        mlp_ratio=4, norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)
-    return model
-
-def mim_vit_huge(**kwargs):
-    model = MIMViT(
-        depth=32, num_heads=16,
+def mim_huge(**kwargs):
+    model = MIM(
+        embed_dim=1280, depth=32, num_heads=16,
         decoder_embed_dim=512, decoder_depth=8, decoder_num_heads=16,
         mlp_ratio=4, norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)
     return model
