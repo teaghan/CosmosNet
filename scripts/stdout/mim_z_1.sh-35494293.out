@@ -1,0 +1,345 @@
+Lmod has detected the following error: These module(s) or extension(s) exist
+but cannot be loaded as requested: "hdf5/1.10.6"
+   Try: "module spider hdf5/1.10.6" to see how to load the module(s).
+
+
+
+Using Torch version: 2.0.1
+Using a cuda device with 2 GPU(s)
+
+Creating model: mim_z_1
+
+Configuration:
+  DATA
+    train_mim_data_paths: ['/project/rrg-kyi/astro/hsc/pdr3_dud/', '/project/rrg-kyi/astro/hsc/pdr3_wide/']
+    val_mim_data_file: HSC_dud_galaxy_zspec_GIRYZ7610_64_val.h5
+    train_labels_data_file: HSC_dud_galaxy_zspec_GIRYZ7610_64_train.h5
+    val_labels_data_file: HSC_dud_galaxy_zspec_GIRYZ7610_64_val.h5
+    bands: ['G', 'I', 'R', 'Y', 'Z', 'NB0387', 'NB0816', 'NB0921', 'NB1010']
+    min_bands: 5
+    cutouts_per_tile: 512
+    use_calexp: False
+    pixel_mean: 0.0
+    pixel_std: 1.0
+    label_keys: ['zspec']
+    label_means: [0.64]
+    label_stds: [0.64]
+  MIM TRAINING
+    batch_size: 64
+    total_batch_iters: 500000
+    stop_mim_batch_iters: 500000
+    mask_method: simmim
+    max_mask_ratio: 0.9
+    norm_pix_loss: True
+    weight_decay: 0.05
+    init_lr: 0.0001
+    final_lr_factor: 10000.0
+    loss_fn: L1
+  SUPERVISED TRAINING
+    num_train: -1
+    batch_size: 64
+    start_batch_iters: 0
+    loss_weight_plateau_batch_iters: 250000
+    augment: True
+    brightness: 0.8
+    noise: 0.1
+    nan_channels: 5
+    loss_fn: mse
+    init_loss_weight: 0.001
+    final_loss_weight: 10.0
+  ARCHITECTURE
+    img_size: 64
+    num_channels: 9
+    patch_size: 8
+    model_size: base
+    ra_dec: True
+    global_pool: map
+  Notes
+    comment: From mim_z_3, less decay
+
+Loading saved model weights...
+Found 43466 patches with at least 5 of the ['G', 'I', 'R', 'Y', 'Z', 'NB0387', 'NB0816', 'NB0921', 'NB1010'] bands.
+Training the network with a batch size of 1 per GPU ...
+Progress will be displayed every 2000 batch iterations and the model will be saved every 10 minutes.
+
+Batch Iterations: 30000/500000 
+Losses:
+	Training Dataset
+		MIM Loss: 0.60240
+		Supervised Loss: 0.01603
+		Supervised MAE: 0.08405
+	Validation Dataset
+		MIM Loss: 0.55863
+		Supervised Loss: 0.00745
+		Supervised MAE: 0.05630
+Saving network...
+
+Batch Iterations: 32000/500000 
+Losses:
+	Training Dataset
+		MIM Loss: 0.60319
+		Supervised Loss: 0.01548
+		Supervised MAE: 0.08248
+	Validation Dataset
+		MIM Loss: 0.55073
+		Supervised Loss: 0.00937
+		Supervised MAE: 0.06561
+Saving network...
+
+Batch Iterations: 34000/500000 
+Losses:
+	Training Dataset
+		MIM Loss: 0.60510
+		Supervised Loss: 0.01510
+		Supervised MAE: 0.08115
+	Validation Dataset
+		MIM Loss: 0.54882
+		Supervised Loss: 0.00695
+		Supervised MAE: 0.05343
+
+Batch Iterations: 36000/500000 
+Losses:
+	Training Dataset
+		MIM Loss: 0.60255
+		Supervised Loss: 0.01464
+		Supervised MAE: 0.07973
+	Validation Dataset
+		MIM Loss: 0.55692
+		Supervised Loss: 0.00639
+		Supervised MAE: 0.05195
+Saving network...
+
+Batch Iterations: 38000/500000 
+Losses:
+	Training Dataset
+		MIM Loss: 0.60741
+		Supervised Loss: 0.01418
+		Supervised MAE: 0.07821
+	Validation Dataset
+		MIM Loss: 0.55344
+		Supervised Loss: 0.01118
+		Supervised MAE: 0.06477
+Saving network...
+
+Batch Iterations: 40000/500000 
+Losses:
+	Training Dataset
+		MIM Loss: 0.60559
+		Supervised Loss: 0.01394
+		Supervised MAE: 0.07721
+	Validation Dataset
+		MIM Loss: 0.55317
+		Supervised Loss: 0.00649
+		Supervised MAE: 0.05521
+
+Batch Iterations: 42000/500000 
+Losses:
+	Training Dataset
+		MIM Loss: 0.60520
+		Supervised Loss: 0.01357
+		Supervised MAE: 0.07582
+	Validation Dataset
+		MIM Loss: 0.54912
+		Supervised Loss: 0.00658
+		Supervised MAE: 0.05125
+Saving network...
+
+Batch Iterations: 44000/500000 
+Losses:
+	Training Dataset
+		MIM Loss: 0.60617
+		Supervised Loss: 0.01340
+		Supervised MAE: 0.07505
+	Validation Dataset
+		MIM Loss: 0.55282
+		Supervised Loss: 0.00608
+		Supervised MAE: 0.05075
+Saving network...
+
+Batch Iterations: 46000/500000 
+Losses:
+	Training Dataset
+		MIM Loss: 0.59807
+		Supervised Loss: 0.01324
+		Supervised MAE: 0.07404
+	Validation Dataset
+		MIM Loss: 0.55409
+		Supervised Loss: 0.00760
+		Supervised MAE: 0.05294
+Saving network...
+
+Batch Iterations: 48000/500000 
+Losses:
+	Training Dataset
+		MIM Loss: 0.60859
+		Supervised Loss: 0.01294
+		Supervised MAE: 0.07346
+	Validation Dataset
+		MIM Loss: 0.55483
+		Supervised Loss: 0.00551
+		Supervised MAE: 0.04833
+
+Batch Iterations: 50000/500000 
+Losses:
+	Training Dataset
+		MIM Loss: 0.60596
+		Supervised Loss: 0.01274
+		Supervised MAE: 0.07262
+	Validation Dataset
+		MIM Loss: 0.54733
+		Supervised Loss: 0.00544
+		Supervised MAE: 0.05010
+Saving network...
+
+Batch Iterations: 52000/500000 
+Losses:
+	Training Dataset
+		MIM Loss: 0.60781
+		Supervised Loss: 0.01252
+		Supervised MAE: 0.07186
+	Validation Dataset
+		MIM Loss: 0.56086
+		Supervised Loss: 0.00450
+		Supervised MAE: 0.04349
+Saving network...
+
+Batch Iterations: 54000/500000 
+Losses:
+	Training Dataset
+		MIM Loss: 0.60758
+		Supervised Loss: 0.01218
+		Supervised MAE: 0.07078
+	Validation Dataset
+		MIM Loss: 0.55593
+		Supervised Loss: 0.00447
+		Supervised MAE: 0.04413
+Saving network...
+
+Batch Iterations: 56000/500000 
+Losses:
+	Training Dataset
+		MIM Loss: 0.60563
+		Supervised Loss: 0.01223
+		Supervised MAE: 0.07054
+	Validation Dataset
+		MIM Loss: 0.55883
+		Supervised Loss: 0.00581
+		Supervised MAE: 0.05057
+
+Batch Iterations: 58000/500000 
+Losses:
+	Training Dataset
+		MIM Loss: 0.60519
+		Supervised Loss: 0.01188
+		Supervised MAE: 0.06952
+	Validation Dataset
+		MIM Loss: 0.55894
+		Supervised Loss: 0.00649
+		Supervised MAE: 0.05187
+Saving network...
+
+Batch Iterations: 60000/500000 
+Losses:
+	Training Dataset
+		MIM Loss: 0.60446
+		Supervised Loss: 0.01182
+		Supervised MAE: 0.06911
+	Validation Dataset
+		MIM Loss: 0.56181
+		Supervised Loss: 0.00508
+		Supervised MAE: 0.04490
+Saving network...
+
+Batch Iterations: 62000/500000 
+Losses:
+	Training Dataset
+		MIM Loss: 0.60407
+		Supervised Loss: 0.01207
+		Supervised MAE: 0.06933
+	Validation Dataset
+		MIM Loss: 0.56489
+		Supervised Loss: 0.00511
+		Supervised MAE: 0.04440
+
+Batch Iterations: 64000/500000 
+Losses:
+	Training Dataset
+		MIM Loss: 0.61098
+		Supervised Loss: 0.01165
+		Supervised MAE: 0.06856
+	Validation Dataset
+		MIM Loss: 0.55594
+		Supervised Loss: 0.00498
+		Supervised MAE: 0.04484
+Saving network...
+
+Batch Iterations: 66000/500000 
+Losses:
+	Training Dataset
+		MIM Loss: 0.59955
+		Supervised Loss: 0.01133
+		Supervised MAE: 0.06774
+	Validation Dataset
+		MIM Loss: 0.55649
+		Supervised Loss: 0.00508
+		Supervised MAE: 0.04581
+Saving network...
+
+Batch Iterations: 68000/500000 
+Losses:
+	Training Dataset
+		MIM Loss: 0.60072
+		Supervised Loss: 0.01118
+		Supervised MAE: 0.06723
+	Validation Dataset
+		MIM Loss: 0.55150
+		Supervised Loss: 0.00467
+		Supervised MAE: 0.04145
+Saving network...
+
+Batch Iterations: 70000/500000 
+Losses:
+	Training Dataset
+		MIM Loss: 0.60123
+		Supervised Loss: 0.01132
+		Supervised MAE: 0.06719
+	Validation Dataset
+		MIM Loss: 0.55204
+		Supervised Loss: 0.00468
+		Supervised MAE: 0.04385
+
+Batch Iterations: 72000/500000 
+Losses:
+	Training Dataset
+		MIM Loss: 0.59854
+		Supervised Loss: 0.01139
+		Supervised MAE: 0.06676
+	Validation Dataset
+		MIM Loss: 0.55811
+		Supervised Loss: 0.00473
+		Supervised MAE: 0.04398
+Saving network...
+
+Batch Iterations: 74000/500000 
+Losses:
+	Training Dataset
+		MIM Loss: 0.60109
+		Supervised Loss: 0.01110
+		Supervised MAE: 0.06641
+	Validation Dataset
+		MIM Loss: 0.55415
+		Supervised Loss: 0.00477
+		Supervised MAE: 0.04485
+Saving network...
+
+Batch Iterations: 76000/500000 
+Losses:
+	Training Dataset
+		MIM Loss: 0.60163
+		Supervised Loss: 0.01099
+		Supervised MAE: 0.06592
+	Validation Dataset
+		MIM Loss: 0.57142
+		Supervised Loss: 0.00696
+		Supervised MAE: 0.05290
+slurmstepd: error: *** JOB 35494293 ON ng10602 CANCELLED AT 2024-10-03T00:24:51 DUE TO TIME LIMIT ***
