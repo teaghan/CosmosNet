@@ -84,15 +84,7 @@ def main(args):
     snr_indices = snr>5
     print(len(np.where(snr_indices)[0]))
 
-    if 'mse' in loss_fn.lower():
-        plot_resid_hexbin([r'$Z$'], tgt_labels[snr_indices], pred_labels[snr_indices], y_lims=[1], 
-                          gridsize=(80,40), max_counts=5, cmap='ocean_r', n_std=4,
-                          savename=os.path.join(fig_dir, f'{model_name}_predictions.png'))
-        
-        evaluate_z(pred_labels[snr_indices], tgt_labels[snr_indices], n_bins=8, z_range=(0.2,1.6), threshold=0.1, 
-                   y_lims=[(-0.08,0.08),(-0.02,0.02),(0,0.03),(0,0.1)], snr=snr[snr_indices],
-                   savename=os.path.join(fig_dir, f'{model_name}_redshift.png'))
-    else:
+    if 'crossentropy' in loss_fn.lower():
         # Turn logit predictions into classes
         pred_class = np.argmax(pred_labels, 1)
         tgt_class = tgt_labels[:,0]        
@@ -100,6 +92,14 @@ def main(args):
         # Plot confusion Matrix
         plot_conf_mat(tgt_class, pred_class, labels, 
                       savename=os.path.join(fig_dir, f'{model_name}_classes.png'))
+    else:
+        plot_resid_hexbin([r'$Z$'], tgt_labels[snr_indices], pred_labels[snr_indices], y_lims=[1], 
+                          gridsize=(80,40), max_counts=5, cmap='ocean_r', n_std=4,
+                          savename=os.path.join(fig_dir, f'{model_name}_predictions.png'))
+        
+        evaluate_z(pred_labels[snr_indices], tgt_labels[snr_indices], n_bins=8, z_range=(0.2,1.6), threshold=0.1, 
+                   y_lims=[(-0.08,0.08),(-0.02,0.02),(0,0.03),(0,0.1)], snr=snr[snr_indices],
+                   savename=os.path.join(fig_dir, f'{model_name}_redshift.png'))
 
 
 # Run the testing
