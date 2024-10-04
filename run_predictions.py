@@ -6,8 +6,8 @@ import torch
 from utils.misc import str2bool, parseArguments, h5_snr
 from utils.model import build_model
 from utils.dataloaders import build_h5_dataloader
-from utils.eval_fns_new import ft_predict
-from utils.plotting_fns import plot_resid_hexbin, evaluate_z, plot_progress, plot_conf_mat
+from utils.eval_fns import ft_predict
+from utils.plotting_fns import plot_resid_hexbin, evaluate_z, plot_conf_mat
 
 def main(args):
     
@@ -54,11 +54,6 @@ def main(args):
         y_lims = [(0,0.005), (0,0.1)]
     else:
         y_lims = [(0,0.2), (0.7,1)]
-
-    # Plot training progress
-    #plot_progress(losses, y_lims=y_lims, 
-    #              savename=os.path.join(fig_dir, 
-    #                                    f'{os.path.basename(model_filename).split(".")[0]}_progress.png'))
     
     # Data loaders
     num_workers = min([os.cpu_count(),12*n_gpu])

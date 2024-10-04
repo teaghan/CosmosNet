@@ -39,6 +39,11 @@ def build_model(config, model_filename, device, build_optimizer=False):
     sup_loss_fn = config['SUPERVISED TRAINING']['loss_fn']
     global_pool = config['ARCHITECTURE']['global_pool']
 
+    if 'quantile' in sup_loss_fn.lower():
+        quantile_alpha = float(config['ARCHITECTURE']['quantile_alpha'])
+        num_labels *= 2
+    else:
+        quantile_alpha = None
 
     # Construct the model
     if model_size=='small':
@@ -55,7 +60,8 @@ def build_model(config, model_filename, device, build_optimizer=False):
                         label_means=label_means,
                         label_stds=label_stds,
                         sup_loss_fn=sup_loss_fn,
-                        global_pool=global_pool)
+                        global_pool=global_pool,
+                        quantile_alpha=quantile_alpha)
     elif model_size=='base':
         model = mim_base(img_size=img_size,
                         in_chans=num_channels,
@@ -70,7 +76,8 @@ def build_model(config, model_filename, device, build_optimizer=False):
                         label_means=label_means,
                         label_stds=label_stds,
                         sup_loss_fn=sup_loss_fn,
-                        global_pool=global_pool)
+                        global_pool=global_pool,
+                        quantile_alpha=quantile_alpha)
     elif model_size=='large':
         model = mim_large(img_size=img_size,
                         in_chans=num_channels,
@@ -85,7 +92,8 @@ def build_model(config, model_filename, device, build_optimizer=False):
                         label_means=label_means,
                         label_stds=label_stds,
                         sup_loss_fn=sup_loss_fn,
-                        global_pool=global_pool)
+                        global_pool=global_pool,
+                        quantile_alpha=quantile_alpha)
     elif model_size=='huge':
         model = mim_huge(img_size=img_size,
                         in_chans=num_channels,
@@ -100,7 +108,8 @@ def build_model(config, model_filename, device, build_optimizer=False):
                         label_means=label_means,
                         label_stds=label_stds,
                         sup_loss_fn=sup_loss_fn,
-                        global_pool=global_pool)
+                        global_pool=global_pool,
+                        quantile_alpha=quantile_alpha)
     else:
         raise ValueError("model_size has to be set to either 'small', 'base', 'large', or 'hugeh' in the config file.")
 
@@ -180,7 +189,8 @@ class MIM(timm.models.vision_transformer.VisionTransformer):
                  decoder_embed_dim=512, decoder_depth=8, decoder_num_heads=16,
                  mlp_ratio=4., norm_layer=nn.LayerNorm, norm_pix_loss=False, 
                  mask_method='simmim', mim_loss_fn='mse', pixel_mean=0, pixel_std=1., ra_dec=False,
-                 label_means=[0], label_stds=[1], sup_loss_fn='mse', **kwargs):
+                 label_means=[0], label_stds=[1], sup_loss_fn='mse',
+                 quantile_alpha=None, **kwargs):
         
         super(MIM, self).__init__(img_size=img_size, patch_size=patch_size,
                                       embed_dim=embed_dim, depth=depth, 
@@ -198,6 +208,9 @@ class MIM(timm.models.vision_transformer.VisionTransformer):
         self.label_means = torch.tensor(label_means)
         self.label_stds = torch.tensor(label_stds)
         self.sup_loss_fn = sup_loss_fn
+        self.quantile_alpha = quantile_alpha
+        if quantile_alpha is not None:
+            self.quantiles = [quantile_alpha / 2, 1 - quantile_alpha / 2]
         
         # --------------------------------------------------------------------------
         # Mapping for each patch of the image to the Embedding space
@@ -566,7 +579,12 @@ class MIM(timm.models.vision_transformer.VisionTransformer):
             loss = self.forward_loss(imgs.detach(), pred, mask)
             return loss, pred, mask
         elif run_pred:
-            return self.forward_head(latent)
+            pred = self.forward_head(latent)
+            if self.quantile_alpha is not None:
+                # Reshape into (batch_size, num_labels, 2) for lower and upper quantiles
+                num_labels = self.num_classes // 2
+                pred = pred.view(-1, num_labels, 2)
+            return pred
 
 def mim_small(**kwargs):
     model = MIM(

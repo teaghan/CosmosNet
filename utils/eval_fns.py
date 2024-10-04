@@ -168,6 +168,10 @@ def ft_predict(model, dataloader, device, num_batches=None, return_images=False,
 
         if hasattr(model, 'module'):
             model = model.module
+
+        if model.quantile_alpha is not None:
+            # Calculate central predictions
+            model_outputs = (model_outputs[..., 0] + model_outputs[..., 1]) / 2
         
         # Rescale back to original scale
         model_outputs = model.denormalize_labels(model_outputs)
