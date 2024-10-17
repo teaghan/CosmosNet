@@ -5,6 +5,8 @@ import sys
 cur_dir = os.path.dirname(__file__)
 sys.path.append(cur_dir)
 from dataloaders import get_augmentations
+from cqr import CQRMIM as CQR
+
 
 def mae_predict(model, dataloader, device, mask_ratio, single_batch=True):
     if not single_batch:
@@ -192,3 +194,22 @@ def ft_predict(model, dataloader, device, num_batches=None, return_images=False,
         return tgt_labels, pred_labels, np.concatenate(images)
     else:
         return tgt_labels, pred_labels
+
+def calibrate_and_predict(model, alpha, dataloader_cal, dataloader_test):
+
+    # Calibrate the model using the calibration dataset
+    predictor = CQR(model)
+    predictor.calibrate(dataloader_cal, alpha)
+
+    # Evaluate on the test dataset
+    y_test_pred, y_test_true = predictor.predict_all(dataloader_test)
+
+    y_test_true = y_test_true.data.cpu().numpy()
+    y_lower = y_test_pred[...,0].data.cpu().numpy()
+    y_upper = y_test_pred[...,1].data.cpu().numpy()
+
+    # Calculate central predictions
+    y_pred_median = (y_upper + y_lower) / 2
+    error_bars = (y_upper - y_lower) / 2
+
+    return y_test_true, y_pred_median, error_bars

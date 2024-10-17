@@ -295,7 +295,7 @@ def train_network(model, dataloader_mim_train, dataloader_mim_val, train_nested_
 
             if len(losses['batch_iters'])>1:
                 # Plot progress
-                plot_progress3(losses, y_lims=[(0.5,0.7), (0.,0.02), (0., 0.1)], 
+                plot_progress3(losses, y_lims=[(0.5,0.7), (0.,0.65), (0., 0.1)], 
                               savename=os.path.join(fig_dir, 
                                                     f'{os.path.basename(model_filename).split(".")[0]}_progress.png'))
             # Plot 5 validation samples

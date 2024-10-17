@@ -524,6 +524,61 @@ def plot_resid_hexbin(label_keys, tgt_stellar_labels, pred_stellar_labels,
     else:
         plt.show()
 
+def plot_predictions_with_uncertainties(tgt_labels, pred_median, uncertainties, label_keys, 
+                                        y_lims=None, savename=None):
+    """
+    Plots predictions vs targets along with error bars (uncertainties) and a one-to-one line.
+    
+    :param tgt_labels: Array of true target values.
+    :param pred_median: Array of median predicted values.
+    :param uncertainties: Array of uncertainties (e.g., standard deviations or half-width of intervals).
+    :param label_keys: List of label names corresponding to target/prediction.
+    :param y_lims: Limits for the y-axis (optional). Can be specified for each label key.
+    :param savename: File name to save the plot (optional).
+    """
+
+    fig, axes = plt.subplots(len(label_keys), 1, figsize=(5, len(label_keys) * 5))
+
+    if not hasattr(axes, '__len__'):
+        axes = [axes]
+
+    bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=1)
+
+    for i, ax in enumerate(axes):
+        label_key = label_keys[i]
+
+        # Plot predictions vs targets
+        tgts = tgt_labels[:, i]
+        preds = pred_median[:, i]
+        uncertainty = uncertainties[:, i]
+
+        # Plot predictions vs targets with error bars
+        ax.errorbar(tgts, preds, yerr=uncertainty, fmt='o', ecolor='gray', alpha=0.7)
+
+        # Plot one-to-one line
+        ax.plot([tgts.min(), tgts.max()], [tgts.min(), tgts.max()], 'k--', lw=2)
+
+        # Set axis labels
+        ax.set_xlabel(f'{label_key}$_{{tgt}}$', size=15)
+        ax.set_ylabel(f'{label_key}$_{{pred}}$', size=15)
+
+        # Define common limits for both x and y axes
+        min_value = min(tgts.min(), preds.min())
+        max_value = max(tgts.max(), preds.max())
+        margin = (max_value - min_value) * 0.1  # Extend limits by 10%
+        
+        ax.set_xlim(min_value - margin, max_value + margin)
+        ax.set_ylim(min_value - margin, max_value + margin)
+
+        ax.tick_params(labelsize=12)
+        ax.grid()
+
+    if savename is not None:
+        plt.savefig(savename, facecolor='white', transparent=False, dpi=100, bbox_inches='tight', pad_inches=0.05)
+    else:
+        plt.show()
+
+
 def photoz_prediction_metrics(z_pred, z_true, threshold=0.15):
 
     resid = (z_pred - z_true) / (1 + z_true)
