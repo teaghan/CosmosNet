@@ -29,6 +29,7 @@ def build_model(config, model_filename, device, build_optimizer=False):
     model_size = config['ARCHITECTURE']['model_size']
     mim_loss_fn = config['MIM TRAINING']['loss_fn']
     ra_dec = str2bool(config['ARCHITECTURE']['ra_dec'])
+    legendre_polys = int(config['ARCHITECTURE']['legendre_polys'])
 
     if 'num_classes' in config['DATA'].keys():
         num_labels = int(config['DATA']['num_classes'])
@@ -56,6 +57,7 @@ def build_model(config, model_filename, device, build_optimizer=False):
                         pixel_mean=pixel_mean,
                         pixel_std=pixel_std,
                         ra_dec=ra_dec,
+                        legendre_polys=legendre_polys,
                         num_classes=num_labels,
                         label_means=label_means,
                         label_stds=label_stds,
@@ -72,6 +74,7 @@ def build_model(config, model_filename, device, build_optimizer=False):
                         pixel_mean=pixel_mean,
                         pixel_std=pixel_std,
                         ra_dec=ra_dec,
+                        legendre_polys=legendre_polys,
                         num_classes=num_labels,
                         label_means=label_means,
                         label_stds=label_stds,
@@ -88,6 +91,7 @@ def build_model(config, model_filename, device, build_optimizer=False):
                         pixel_mean=pixel_mean,
                         pixel_std=pixel_std,
                         ra_dec=ra_dec,
+                        legendre_polys=legendre_polys,
                         num_classes=num_labels,
                         label_means=label_means,
                         label_stds=label_stds,
@@ -104,6 +108,7 @@ def build_model(config, model_filename, device, build_optimizer=False):
                         pixel_mean=pixel_mean,
                         pixel_std=pixel_std,
                         ra_dec=ra_dec,
+                        legendre_polys=legendre_polys,
                         num_classes=num_labels,
                         label_means=label_means,
                         label_stds=label_stds,
@@ -189,7 +194,7 @@ class MIM(timm.models.vision_transformer.VisionTransformer):
                  decoder_embed_dim=512, decoder_depth=8, decoder_num_heads=16,
                  mlp_ratio=4., norm_layer=nn.LayerNorm, norm_pix_loss=False, 
                  mask_method='simmim', mim_loss_fn='mse', pixel_mean=0, pixel_std=1., ra_dec=False,
-                 label_means=[0], label_stds=[1], sup_loss_fn='mse',
+                 legendre_polys=100, label_means=[0], label_stds=[1], sup_loss_fn='mse',
                  quantile_alpha=None, **kwargs):
         
         super(MIM, self).__init__(img_size=img_size, patch_size=patch_size,
@@ -220,7 +225,7 @@ class MIM(timm.models.vision_transformer.VisionTransformer):
         if self.ra_dec:
             # Mapping for Right Ascension and Dec to the Embedding space
             self.ra_dec_embed = LocationEncoder(neural_network_name="siren", 
-                                                legendre_polys=5,
+                                                legendre_polys=legendre_polys,
                                                 dim_hidden=8,
                                                 num_layers=1,
                                                 num_classes=embed_dim)

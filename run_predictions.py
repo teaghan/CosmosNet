@@ -9,7 +9,7 @@ from utils.dataloaders import build_h5_dataloader
 from utils.eval_fns import ft_predict, calibrate_and_predict
 from utils.plotting_fns import plot_resid_hexbin, evaluate_z, plot_conf_mat, plot_predictions_with_uncertainties
 
-def snr_cutoff(fn, snr_min=5):
+def snr_cutoff(fn, snr_cut=5, min_cut=True):
     snr_vals = h5_snr(h5_path=fn, n_central_pix=8, 
                       batch_size=5000, num_samples=None)
     
@@ -17,7 +17,10 @@ def snr_cutoff(fn, snr_min=5):
     snr = np.nanmin(snr_vals[:,:5], axis=(1))
     
     # Only display objects that are not super noisy
-    snr_indices = np.where(snr>snr_min)[0]
+    if min_cut:
+        snr_indices = np.where(snr>snr_cut)[0]
+    else:
+        snr_indices = np.where(snr<snr_cut)[0]
     return snr_indices, snr[snr_indices]
 
 def main(args):
@@ -70,7 +73,7 @@ def main(args):
     num_workers = min([os.cpu_count(),12*n_gpu])
 
     val_indices, snr_val = snr_cutoff(os.path.join(data_dir, config['DATA']['val_labels_data_file']),
-                             snr_min=1)
+                             snr_cut=5, min_cut=True)
     dataloader_val = build_h5_dataloader(os.path.join(data_dir, config['DATA']['val_labels_data_file']), 
                                         batch_size=int(config['SUPERVISED TRAINING']['batch_size']), 
                                         num_workers=num_workers,
@@ -86,7 +89,7 @@ def main(args):
     if 'cal_labels_data_file' in config['DATA'].keys():
         run_calibration = True
         cal_indices, snr_cal = snr_cutoff(os.path.join(data_dir, config['DATA']['cal_labels_data_file']),
-                             snr_min=1)
+                             snr_cut=5, min_cut=True)
         dataloader_cal = build_h5_dataloader(os.path.join(data_dir, config['DATA']['cal_labels_data_file']), 
                                         batch_size=int(config['SUPERVISED TRAINING']['batch_size']), 
                                         num_workers=num_workers,
